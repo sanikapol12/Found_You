@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/view/feedback_page.dart';
 
 class HelpCenterPage extends StatelessWidget {
   const HelpCenterPage({super.key});
@@ -9,7 +10,10 @@ class HelpCenterPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Help Center'),
+        title: const Text(
+          'Help Center',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
@@ -17,14 +21,10 @@ class HelpCenterPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // --- Intro Section ---
             const Text(
               'How can we help you?',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
@@ -58,7 +58,7 @@ class HelpCenterPage extends StatelessWidget {
               "You can contact our support team by using the 'Contact Support' option below or by emailing us directly.",
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 10),
 
             // --- Contact Support Section ---
             const Text(
@@ -81,7 +81,10 @@ class HelpCenterPage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.chat_bubble_outline, color: Colors.green),
+              leading: const Icon(
+                Icons.chat_bubble_outline,
+                color: Colors.green,
+              ),
               title: const Text('Chat with Us'),
               subtitle: const Text('Get instant help from our team'),
               onTap: () {
@@ -91,34 +94,71 @@ class HelpCenterPage extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 10),
 
             // --- Feedback Section ---
-            const Text(
-              'Send Feedback',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+            Center(
+              child: const Text(
+                'Send Feedback',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
               ),
             ),
             const SizedBox(height: 10),
             Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Feedback form coming soon!")),
-                  );
-                },
-                icon: const Icon(Icons.feedback_outlined),
-                label: const Text("Give Feedback",style: TextStyle(
-                  color: Colors.white
-                ),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:Color.fromARGB(255, 61, 61, 61),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF7F00FF), // Purple
+                      Color(0xFFE100FF), // Pink
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFE100FF).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FeedbackPage(),
+                      ),
+                    );
+                  },
+
+                  icon: const Icon(
+                    Icons.feedback_outlined,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Give Feedback",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, //  show gradient
+                    shadowColor: Colors.transparent, //  remove default shadow
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),
@@ -142,7 +182,10 @@ class HelpCenterPage extends StatelessWidget {
         ),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Text(answer, style: const TextStyle(color: Colors.black87)),
           ),
         ],

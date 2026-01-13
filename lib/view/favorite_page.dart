@@ -1,37 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/controller/favorite_controller.dart';
+import 'package:flutter_project/view/home_page.dart';
+import 'package:flutter_project/widget/botton_nav_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:animate_do/animate_do.dart'; // Add in pubspec.yaml: animate_do: ^3.0.2
 
 class FavoritePage extends StatefulWidget {
-  FavoritePage({super.key});
+  const FavoritePage({super.key});
+
   @override
- State createState() => _FavoritePageState();
-
+  State<FavoritePage> createState() => _FavoritePageState();
 }
-class _FavoritePageState extends State{
 
+class _FavoritePageState extends State<FavoritePage> {
+  final Addtofavoriteclass addtofavoriteObj = Addtofavoriteclass();
+  bool _isLoading = true;
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _favoriteDocs = [];
 
-  final List<Map<String, String>> favoriteItems = [
-    {
-      "title": "Stylish Chair",
-      "subtitle": "Comfortable wooden chair for living room",
-      "image":
-          "https://th.bing.com/th/id/OIP.po3Sxdf4a2oZZzkSN9D3IQHaHa?w=171&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      "price": "\$120",
-    },
-    {
-      "title": "Modern Lamp",
-      "subtitle": "Bright LED lamp for study or work desk",
-      "image":
-          "https://th.bing.com/th/id/OIP.wZ9TIXABLaRIq6TLMm3rSwHaHa?w=196&h=196&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      "price": "\$45",
-    },
-    {
-      "title": "Cozy Sofa",
-      "subtitle": "Elegant 3-seater sofa for your living room",
-      "image":
-          "https://th.bing.com/th/id/OIF.vGfGAoqQex3jQxllFotmfA?w=206&h=206&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      "price": "\$350",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchFavoriteData();
+  }
+
+  Future<void> fetchFavoriteData() async {
+    setState(() => _isLoading = true);
+    try {
+      final snapshot = await addtofavoriteObj.getfavoritebuisnessData();
+      setState(() {
+        _favoriteDocs = snapshot.docs
+            .cast<QueryDocumentSnapshot<Map<String, dynamic>>>();
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(" Error fetching favorites: $e");
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> deleteFavorite(String docId) async {
+    await addtofavoriteObj.deleteFavoriteBusiness(docId);
+    await fetchFavoriteData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,125 +49,165 @@ class _FavoritePageState extends State{
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false,
+            );
+          },
+          icon: ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 22,
+            ),
+          ),
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
-            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+            colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-          ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+          ).createShader(bounds),
           child: const Text(
             "Favorites",
             style: TextStyle(
-              color: Colors.white, // Required for ShaderMask
+              color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: favoriteItems.length,
-        itemBuilder: (context, index) {
-          final item = favoriteItems[index];
-          return GestureDetector(
-            onTap: () {
-              // Navigate to product details page
-            },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _favoriteDocs.isEmpty
+          ? const Center(
+              child: Text(
+                "No favorite shops yet ❤️",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              child: Row(
-                children: [
-                  // Product Image
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      bottomLeft: Radius.circular(20),
-                    ),
-                    child: Image.network(
-                      item["image"]!,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              itemCount: _favoriteDocs.length,
+              itemBuilder: (context, index) {
+                final item = _favoriteDocs[index].data();
+                final docId = _favoriteDocs[index].id;
+                final imageUrl = item['imageURL'] ?? item['imageUrl'] ?? '';
 
-                  const SizedBox(width: 16),
-
-                  // Product Info
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                return FadeInUp(
+                  duration: Duration(milliseconds: 350 + (index * 100)),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 18),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    padding: const EdgeInsets.all(1.5), // border width
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
                         children: [
-                          Text(
-                            item["title"]!,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                            ),
+                            child: Image.network(
+                              imageUrl.isNotEmpty
+                                  ? imageUrl
+                                  : "https://cdn-icons-png.flaticon.com/512/679/679720.png",
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item["subtitle"]!,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    item["businessName"] ?? "Unknown Business",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item["discription"] ??
+                                        "No description available",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black54,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            item["price"]!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2575FC),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Color.fromARGB(255, 243, 23, 23),
+                              size: 26,
                             ),
+                            onPressed: () async {
+                              await deleteFavorite(docId);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.purpleAccent,
+                                  content: const Text(
+                                    "Removed from favorites ❤️",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
                     ),
                   ),
-
-                  // Favorite Action
-                 IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red),
-                          onPressed: () {
-                            setState(() {
-                              favoriteItems.removeAt(index);
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Item removed from favorites"),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                        ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
+
+      bottomNavigationBar: const BottomNavWidget(currentIndex: 2),
     );
   }
 }

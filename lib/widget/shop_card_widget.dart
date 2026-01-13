@@ -1,0 +1,102 @@
+// import 'package:flutter/material.dart';
+// import '../model/shop_model.dart';
+
+// class ShopCard extends StatelessWidget {
+//   final Shop shop;
+
+//   const ShopCard({super.key, required this.shop});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       elevation: 4,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+//       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+//       child: Padding(
+//         padding: const EdgeInsets.all(12),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             // Shop image
+//             ClipRRect(
+//               borderRadius: BorderRadius.circular(15),
+//               child: Image.network(
+//                 shop.imageUrl,
+//                 width: double.infinity,
+//                 height: 150,
+//                 fit: BoxFit.cover,
+//               ),
+//             ),
+//             const SizedBox(height: 8),
+            
+//             // Name & Category
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text(
+//                   shop.name,
+//                   style: const TextStyle(
+//                       fontSize: 18, fontWeight: FontWeight.bold),
+//                 ),
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+//                   decoration: BoxDecoration(
+//                     color: Colors.blueAccent,
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Text(
+//                     shop.category,
+//                     style: const TextStyle(color: Colors.white),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 4),
+            
+//             // Rating & Distance
+//             Row(
+//               children: [
+//                 Icon(Icons.star, color: Colors.orange, size: 16),
+//                 const SizedBox(width: 4),
+//                 Text("${shop.rating}"),
+//                 const SizedBox(width: 12),
+//                 Icon(Icons.location_on, size: 16, color: Colors.grey),
+//                 const SizedBox(width: 4),
+//                 Text("${shop.distance} km away"),
+//               ],
+//             ),
+//             const SizedBox(height: 8),
+            
+//             // Description
+//             Text(
+//               shop.description,
+//               style: const TextStyle(fontSize: 14, color: Colors.black87),
+//             ),
+//             const SizedBox(height: 8),
+            
+//             // Contact & Location buttons
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 ElevatedButton.icon(
+//                   onPressed: () {
+//                     // Call shop
+//                   },
+//                   icon: const Icon(Icons.call),
+//                   label: const Text("Call"),
+//                 ),
+//                 ElevatedButton.icon(
+//                   onPressed: () {
+//                     // Navigate to map / location
+//                   },
+//                   icon: const Icon(Icons.map),
+//                   label: const Text("Map"),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

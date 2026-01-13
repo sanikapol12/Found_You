@@ -45,7 +45,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 32, 20, 18),
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         leading: IconButton(
           onPressed: () {
             Navigator.push(
@@ -53,14 +53,14 @@ class _LoginState extends State<Login> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
           },
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.search, color: Colors.white),
+        //     onPressed: () {},
+        //   ),
+        // ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -75,12 +75,26 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 16, 17, 17),
+                  ShaderMask(
+                    shaderCallback: (bounds) =>
+                        const LinearGradient(
+                          colors: [
+                            Color(0xFF7F00FF),
+                            Color(0xFFE100FF),
+                          ], // Purple → Pink
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(
+                          Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                        ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Colors.white, // Important: keeps gradient visible
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -175,68 +189,89 @@ class _LoginState extends State<Login> {
                   // Login button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          if (_agreeToTerms) {
-                            try {
-                              UserCredential userCredentialObj =
-                                  await _firebaseauthObj
-                                      .signInWithEmailAndPassword(
-                                        email: emailController.text.trim(),
-                                        password: passwordController.text
-                                            .trim(),
-                                      );
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF7F00FF), // Purple
+                            Color(0xFFE100FF), // Pink
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            if (_agreeToTerms) {
+                              try {
+                                UserCredential userCredentialObj =
+                                    await _firebaseauthObj
+                                        .signInWithEmailAndPassword(
+                                          email: emailController.text.trim(),
+                                          password: passwordController.text
+                                              .trim(),
+                                        );
 
-                              log("User Credentials:$userCredentialObj");
-                              log("User: ${userCredentialObj.user}");
+                                log("User Credentials:$userCredentialObj");
+                                log("User: ${userCredentialObj.user}");
+                                log("User Id:${userCredentialObj.user!.uid}");
 
-                              log("User Id:${userCredentialObj.user!.uid}");
+                                CustomSnackBars().showCustomSnackbar(
+                                  context,
+                                  "Login Successful",
+                                );
+
+                                Login(context, userCredentialObj);
+
+                                confirmpasswordController.clear();
+                              } on FirebaseAuthException catch (error) {
+                                CustomSnackBars().showCustomSnackbar(
+                                  context,
+                                  error.message!,
+                                  bgColor: Colors.red,
+                                );
+                              }
+                            } else {
                               CustomSnackBars().showCustomSnackbar(
                                 context,
-                                "Login Successful",
-                              );
-
-                              Login(context, userCredentialObj);
-
-                              confirmpasswordController.clear();
-                            } on FirebaseAuthException catch (error) {
-                              CustomSnackBars().showCustomSnackbar(
-                                context,
-                                error.message!,
+                                "You must agree to the Terms & Privacy Policy",
                                 bgColor: Colors.red,
                               );
                             }
                           } else {
                             CustomSnackBars().showCustomSnackbar(
                               context,
-                              "You must agree to the Terms & Privacy Policy",
+                              "Enter Valid Data",
                               bgColor: Colors.red,
                             );
                           }
-                        } else {
-                          CustomSnackBars().showCustomSnackbar(
-                            context,
-                            "Enter Valid Data",
-                            bgColor: Colors.red,
-                          );
-                        }
-                        emailController.clear();
-                        passwordController.clear();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[900],
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          emailController.clear();
+                          passwordController.clear();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.transparent, // allows gradient to show
+                          shadowColor:
+                              Colors.transparent, // removes extra shadow
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Log In',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                        child: const Text(
+                          'Log In',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -252,7 +287,7 @@ class _LoginState extends State<Login> {
                           );
                         },
                         child: Text(
-                          "Sign up",
+                          "  Sign up",
                           style: TextStyle(color: Colors.blue[900]),
                         ),
                       ),

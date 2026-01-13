@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/view/home_page.dart';
+import 'package:flutter_project/view/onboarding_screen.dart';
+import 'package:flutter_project/view/splashscreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +26,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'MVC Category Demo',
+      title: 'conneting the people',
       theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: HomePage(),
+      home: SplashscreenPage(),
     );
   }
 }

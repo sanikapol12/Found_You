@@ -13,6 +13,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
   final PageController _pageController = PageController();
   final BannerController _controller = BannerController();
   int _currentPage = 0;
+  bool _isForward = true; // 👈 Track direction
   Timer? _timer;
 
   @override
@@ -23,15 +24,32 @@ class _BannerCarouselState extends State<BannerCarousel> {
 
   void _startAutoSlide() {
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (_pageController.hasClients) {
-        _currentPage = (_currentPage + 1) % _controller.getAllBanners().length;
-        _pageController.animateToPage(
-          _currentPage,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOut,
-        );
-        setState(() {});
+      final banners = _controller.getAllBanners();
+      if (banners.isEmpty || !_pageController.hasClients) return;
+
+      if (_isForward) {
+        if (_currentPage < banners.length - 1) {
+          _currentPage++;
+        } else {
+          _isForward = false; // reached end → reverse direction
+          _currentPage--;
+        }
+      } else {
+        if (_currentPage > 0) {
+          _currentPage--;
+        } else {
+          _isForward = true; // reached start → forward again
+          _currentPage++;
+        }
       }
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+
+      setState(() {});
     });
   }
 
@@ -53,6 +71,11 @@ class _BannerCarouselState extends State<BannerCarousel> {
           child: PageView.builder(
             controller: _pageController,
             itemCount: banners.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
             itemBuilder: (context, index) {
               final banner = banners[index];
               return AnimatedContainer(
@@ -60,11 +83,6 @@ class _BannerCarouselState extends State<BannerCarousel> {
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  // gradient: LinearGradient(
-                  //   colors: banner.gradientColors,
-                  //   begin: Alignment.topLeft,
-                  //   end: Alignment.bottomRight,
-                  // ),
                   image: DecorationImage(
                     image: NetworkImage(banner.imageUrl),
                     fit: BoxFit.cover,
@@ -94,7 +112,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
           ),
         ),
 
-        // Dots Indicator
+        // 🔘 Dots Indicator
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(banners.length, (index) {

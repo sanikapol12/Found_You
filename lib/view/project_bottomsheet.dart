@@ -56,8 +56,11 @@ class AddProjectBottomSheet {
                       ),
                       child: controller.selectedImage == null
                           ? const Center(
-                              child: Icon(Icons.add_a_photo,
-                                  size: 40, color: Colors.grey),
+                              child: Icon(
+                                Icons.add_a_photo,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
                             )
                           : null,
                     ),
@@ -67,8 +70,9 @@ class AddProjectBottomSheet {
 
                   TextField(
                     controller: nameController,
-                    decoration:
-                        const InputDecoration(labelText: "Project Name (optional)"),
+                    decoration: const InputDecoration(
+                      labelText: "Project Name (optional)",
+                    ),
                   ),
                   // TextField(
                   //   controller: priceController,
@@ -97,16 +101,16 @@ class AddProjectBottomSheet {
                       ),
                     ),
                     onPressed: () async {
-                      await controller.addProject(
+                      await controller.saveProject(
                         name: nameController.text,
-                        price: priceController.text,
-                        category: categoryController.text,
                         description: descriptionController.text.isEmpty
                             ? null
                             : descriptionController.text,
                       );
+
                       Navigator.pop(context);
                     },
+
                     child: const Text("Add Project"),
                   ),
                   const SizedBox(height: 16),

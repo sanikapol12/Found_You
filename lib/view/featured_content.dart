@@ -100,7 +100,8 @@ class FeaturedContentView extends StatelessWidget {
         const SizedBox(height: 20),
         ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
-            colors: [Colors.blue, Colors.purple, Colors.red],
+            colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
+            // colors: [Colors.blue, Colors.purple, Colors.red],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ).createShader(bounds),
@@ -124,7 +125,10 @@ class FeaturedContentView extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SubCategoryPage(category: item.category, subcategoryName: null,),
+                      builder: (_) => SubCategoryPage(
+                        category: item.category,
+                        subcategoryName: null,
+                      ),
                     ),
                   );
                 },

@@ -13,6 +13,15 @@ class UserController {
     sharedPreferencesobj.setBool('isLogin', obj['isLogin']);
   }
 
+  Future<void> setRegisterBusiness(Map obj) async {
+    SharedPreferences sharedPreferencesobj =
+        await SharedPreferences.getInstance();
+    sharedPreferencesobj.setBool(
+      'isRegisterBusiness',
+      obj['isRegisterBusiness'],
+    );
+  }
+
   Future<void> getSharePrefrenceData() async {
     SharedPreferences sharedPreferencesobj =
         await SharedPreferences.getInstance();

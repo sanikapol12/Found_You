@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_project/controller/profile_controller.dart';
 import 'package:flutter_project/view/customeSnackBar.dart';
 import 'package:flutter_project/view/login_page.dart';
 
@@ -24,14 +25,17 @@ class _SignuppageState extends State<Signuppage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmpasswordController = TextEditingController();
+  TextEditingController phoneNoController = TextEditingController();
+  ProfileController profilecontrollerobj = ProfileController();
 
   final FirebaseAuth _firebaseauthObj = FirebaseAuth.instance;
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 32, 20, 18),
+        backgroundColor: Color.fromARGB(255, 240, 240, 240),
         leading: IconButton(
           onPressed: () {
             Navigator.push(
@@ -39,15 +43,15 @@ class _SignuppageState extends State<Signuppage> {
               MaterialPageRoute(builder: (context) => Login()),
             );
           },
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
         ),
 
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.search, color: Colors.black),
+        //     onPressed: () {},
+        //   ),
+        // ],
         //  backgroundColor: Colors.white,
       ),
       body: Container(
@@ -63,14 +67,29 @@ class _SignuppageState extends State<Signuppage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 16, 17, 17),
+                  ShaderMask(
+                    shaderCallback: (bounds) =>
+                        const LinearGradient(
+                          colors: [
+                            Color(0xFF7F00FF),
+                            Color(0xFFE100FF),
+                          ], // Purple → Pink
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(
+                          Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                        ),
+                    child: const Text(
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Colors.white, // Important: keeps gradient visible
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 10),
                   const Text(
                     'Join us and explore amazing services!',
@@ -83,6 +102,19 @@ class _SignuppageState extends State<Signuppage> {
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person_2_outlined),
                       labelText: 'Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: phoneNoController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person_2_outlined),
+                      labelText: 'Phone No',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
@@ -213,77 +245,109 @@ class _SignuppageState extends State<Signuppage> {
                   // Login button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (emailController.text.trim().isNotEmpty &&
-                            passwordController.text.trim().isNotEmpty) {
-                          try {
-                            UserCredential userCredentialObj =
-                                await _firebaseauthObj
-                                    .createUserWithEmailAndPassword(
-                                      email: emailController.text,
-                                      password: passwordController.text,
-                                    );
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF7F00FF),
+                            Color(0xFFE100FF),
+                          ], // Purple → Pink
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (emailController.text.trim().isNotEmpty &&
+                              passwordController.text.trim().isNotEmpty) {
+                            try {
+                              UserCredential userCredentialObj =
+                                  await _firebaseauthObj
+                                      .createUserWithEmailAndPassword(
+                                        email: emailController.text,
+                                        password: passwordController.text,
+                                      );
 
-                            log("User Credentials:$userCredentialObj");
+                              log("User Credentials:$userCredentialObj");
 
+                              Map<String, dynamic> data = {
+                                "name": nameController.text,
+                                "phoneNo": phoneNoController.text,
+                                "email": emailController.text,
+                                "password": passwordController.text,
+                                "joinDate":
+                                    user!.metadata.creationTime ??
+                                    DateTime.now(),
+                              };
+                              profilecontrollerobj.addData(data: data);
+
+                              CustomSnackBars().showCustomSnackbar(
+                                context,
+                                "Register Successful",
+                              );
+
+                              emailController.clear();
+                              passwordController.clear();
+
+                              Navigator.of(context).pop();
+                            } on FirebaseAuthException catch (error) {
+                              log("Error Code: ${error.code}");
+                              log("Error Message: ${error.message}");
+                              if (error.code.toString() == "invalid-email") {
+                                CustomSnackBars().showCustomSnackbar(
+                                  context,
+                                  "Enter Valid Email",
+                                  bgColor: Colors.red,
+                                );
+                              } else {
+                                CustomSnackBars().showCustomSnackbar(
+                                  context,
+                                  error.message!,
+                                  bgColor: Colors.red,
+                                );
+                              }
+                            }
+                          } else {
                             CustomSnackBars().showCustomSnackbar(
                               context,
-                              "Register Successful",
+                              "Enter Valid Data",
+                              bgColor: Colors.red,
                             );
-
-                            emailController.clear();
-                            passwordController.clear();
-
-                            Navigator.of(context).pop();
-                          } on FirebaseAuthException catch (error) {
-                            log("Error Code: ${error.code}");
-                            log("Error Message: ${error.message}");
-                            if (error.code.toString() == "invalid-email") {
-                              CustomSnackBars().showCustomSnackbar(
-                                context,
-                                "Enter Valid Email",
-                                bgColor: Colors.red,
-                              );
-                            } else {
-                              CustomSnackBars().showCustomSnackbar(
-                                context,
-                                error.message!,
-                                bgColor: Colors.red,
-                              );
-                            }
                           }
-                        } else {
-                          CustomSnackBars().showCustomSnackbar(
-                            context,
-                            "Enter Valid Data",
-                            bgColor: Colors.red,
-                          );
-                        }
 
-                        log("${nameController}");
-                        log("${emailController}");
-                        log("${passwordController}");
-                        log("${confirmpasswordController}");
+                          log("${nameController}");
+                          log("${emailController}");
+                          log("${passwordController}");
+                          log("${confirmpasswordController}");
 
-                        nameController.clear();
-                        emailController.clear();
-                        passwordController.clear();
-                        confirmpasswordController.clear();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[900],
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          nameController.clear();
+                          emailController.clear();
+                          passwordController.clear();
+                          confirmpasswordController.clear();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors
+                              .transparent, // Transparent to show gradient
+                          shadowColor: Colors
+                              .transparent, // Optional: removes button shadow
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 15),
                 ],
               ),

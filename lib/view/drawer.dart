@@ -150,6 +150,8 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_project/view/about_us_page.dart';
+import 'package:flutter_project/view/ask_ai.dart';
 import 'package:flutter_project/view/favorite_page.dart';
 import 'package:flutter_project/view/help_center.dart';
 import 'package:flutter_project/view/home_page.dart';
@@ -157,7 +159,7 @@ import 'package:flutter_project/view/login_page.dart';
 import 'package:flutter_project/view/order_history.dart';
 import 'package:flutter_project/view/privacy_policy_page.dart';
 import 'package:flutter_project/view/profilepage.dart';
-import 'package:flutter_project/view/setting_page.dart';
+import 'package:flutter_project/view/setting.dart';
 import 'package:flutter_project/view/transaction_page.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -196,10 +198,7 @@ class AppDrawer extends StatelessWidget {
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 171, 214, 209), // teal shade 1
-                    Color.fromARGB(255, 79, 86, 215), // teal shade 2
-                  ],
+                  colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
                   // colors: [
                   //   Color(0xFF26A69A), // teal shade 1
                   //   Color(0xFF00897B), // teal shade 2
@@ -244,7 +243,7 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pop(context); // Close the drawer first
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Profilepage()),
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
               },
             ),
@@ -260,6 +259,7 @@ class AppDrawer extends StatelessWidget {
                 );
               },
             ),
+
             // _buildDrawerItem(
             //   icon: Icons.bookmark,
             //   text: 'Projects',
@@ -271,7 +271,6 @@ class AppDrawer extends StatelessWidget {
             //     //  );
             //   },
             // ),
-
             _buildDrawerItem(
               icon: Icons.history,
               iconColor: Colors.blue,
@@ -312,6 +311,31 @@ class AppDrawer extends StatelessWidget {
             ),
 
             _buildDrawerItem(
+              icon: Icons.smart_toy_outlined, //  nice icon for AI
+              iconColor: Colors.deepPurple,
+              text: 'Ask AI',
+              onTap: () {
+                Navigator.pop(context); // Drawer close
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AskAIPage()),
+                );
+              },
+            ),
+             _buildDrawerItem(
+              icon: Icons.group_outlined,
+              iconColor: Colors.amber,
+              text: 'Complaints',
+              onTap: () {
+                Navigator.pop(context); // Close the drawer first
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => AboutPage()),
+                // );
+              },
+            ),
+
+            _buildDrawerItem(
               icon: Icons.headphones,
               iconColor: Colors.green,
               text: 'Help center',
@@ -345,6 +369,19 @@ class AppDrawer extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
                 );
+              },
+            ),
+
+            _buildDrawerItem(
+              icon: Icons.group_outlined,
+              iconColor: Colors.amber,
+              text: 'About Us',
+              onTap: () {
+                Navigator.pop(context); // Close the drawer first
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => AboutPage()),
+                // );
               },
             ),
 

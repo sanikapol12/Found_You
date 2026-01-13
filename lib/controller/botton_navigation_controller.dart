@@ -5,30 +5,36 @@ import 'package:flutter_project/view/profilepage.dart';
 import '../view/home_page.dart';
 
 class BottomNavController {
-  int selectedIndex = 0;
-
-  // Page navigation logic
   void onItemTapped(BuildContext context, int index) {
-    selectedIndex = index;
-
     Widget page;
+
     switch (index) {
       case 0:
-        page = HomePage();
+        page = const HomePage();
         break;
       case 1:
-        page = CategoryPage();
+        page = const CategoryPage();
         break;
       case 2:
-        page =  FavoritePage();
+        page = const FavoritePage();
         break;
       case 3:
-        page = const Profilepage();
+        page = ProfilePage();
         break;
       default:
-        page = HomePage();
+        page = const HomePage();
     }
 
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    // ✅ Use pushReplacement so only one page stays in stack
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => page,
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 }

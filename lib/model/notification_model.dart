@@ -1,11 +1,15 @@
-class AppNotification {
-  final String title;
+class NotificationModel {
+  final String id;
+  final String name;
   final String message;
-  final DateTime date;
+  final String? profileUrl;
+  String status; // pending, accepted, deleted
 
-  AppNotification({
-    required this.title,
+  NotificationModel({
+    required this.id,
+    required this.name,
     required this.message,
-    required this.date,
+    this.profileUrl,
+    this.status = 'pending',
   });
 }
